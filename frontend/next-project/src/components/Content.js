@@ -28,6 +28,7 @@ function Content() {
       <h1>Content</h1>
       <h4>User: {currentUser.name}</h4>
       <h4>ID: {currentUser.id}</h4>
+      <h4>ID right here! HAHAHAHAAHHAHAH </h4>
       <Grid item>
         <Button
           variant="outlined"
