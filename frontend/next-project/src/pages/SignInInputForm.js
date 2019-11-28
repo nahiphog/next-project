@@ -8,9 +8,8 @@ export default function SignInInputForm({ userSignIn, setUserSignIn }) {
       <Container maxWidth="sm">
         {/* Username */}
         <TextField
-          id="outlined-full-width"
+          id="username-input"
           label="Username"
-          style={{ margin: 8 }}
           placeholder="Username"
           fullWidth
           margin="normal"
@@ -18,7 +17,7 @@ export default function SignInInputForm({ userSignIn, setUserSignIn }) {
             shrink: true
           }}
           variant="outlined"
-          type="name"
+          type="text"
           value={userSignIn.name}
           onChange={e =>
             setUserSignIn({
@@ -30,9 +29,8 @@ export default function SignInInputForm({ userSignIn, setUserSignIn }) {
 
         {/* Password */}
         <TextField
-          id="outlined-full-width"
+          id="password-input"
           label="Password"
-          style={{ margin: 8 }}
           placeholder="Password"
           fullWidth
           margin="normal"

@@ -1,38 +1,27 @@
 import axios from "axios";
+import { getApiRoute } from "../global";
 
 /* Functions */
-
 export const generateData = () => {
-  editprofile();
-  // getAllUsers();
-  // getUser(8);
-  // signUpUser();
+  getAllEvents();
+  // createEvent(4, 13, ); // confirm datetime format with Pi Han
 };
 
-export const signin = () => {
-  const name = "111";
-  const password = "123";
-  signInUser(name, password);
-};
-
-export const signout = () => {
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("userData");
-};
-
-export const editprofile = () => {
-  const id = "8";
-  const name = "1";
-  const email = "1@email.com";
-  const password = "123";
-  updateUser(id, name, email, password);
+/* Token Config */
+const getTokenConfig = () => {
+  const token = localStorage.getItem("userToken");
+  const config = {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  };
+  return config;
 };
 
 /* Session */
-
 export const signInUser = (username, userpassword) => {
   axios
-    .post(`http://127.0.0.1:5000/api/v1/sessions/signin`, {
+    .post(`${getApiRoute("sessions/signin")}`, {
       name: username,
       password: userpassword
     })
@@ -48,10 +37,9 @@ export const signInUser = (username, userpassword) => {
 };
 
 /* User */
-
 export const getAllUsers = () => {
   axios
-    .get(`http://127.0.0.1:5000/api/v1/users/`)
+    .get(`${getApiRoute("users/")}`)
     .then(result => {
       const users = result.data;
       console.log(users);
@@ -63,10 +51,10 @@ export const getAllUsers = () => {
 
 export const getUser = id => {
   axios
-    .get(`http://127.0.0.1:5000/api/v1/users/${id}`)
+    .get(`${getApiRoute("users/")}${id}`)
     .then(result => {
       const user = result.data;
-      console.log(result);
+      console.log(user);
     })
     .catch(error => {
       console.log("ERROR: ", error);
@@ -74,22 +62,15 @@ export const getUser = id => {
 };
 
 export const updateUser = (id, username, useremail, userpassword) => {
-  const token = localStorage.getItem("userToken");
-  const config = {
-    headers: {
-      Authorization: "Bearer " + token
-    }
-  };
-
   axios
     .post(
-      `http://127.0.0.1:5000/api/v1/users/${id}`,
+      `${getApiRoute("users/")}${id}`,
       {
         name: username,
         email: useremail,
         password: userpassword
       },
-      config
+      getTokenConfig()
     )
     .then(result => {
       console.log(result.data.data);
@@ -101,10 +82,92 @@ export const updateUser = (id, username, useremail, userpassword) => {
 
 export const signUpUser = () => {
   axios
-    .post(`http://127.0.0.1:5000/api/v1/users/signup`, {
+    .post(`${getApiRoute("users/")}signup`, {
       name: "5",
       email: "5@email.com",
       password: "123"
+    })
+    .then(result => {
+      console.log(result.data.data);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
+/* Lessons */
+export const getAllLessons = () => {
+  axios
+    .get(`${getApiRoute("lessons/")}`)
+    .then(result => {
+      const lessons = result.data;
+      console.log(lessons);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
+/* Skills */
+export const generateSkillList = () => {
+  createSkill("Computer Science");
+  createSkill("Cooking");
+  createSkill("Literature");
+  createSkill("Biology");
+  createSkill("Chemistry");
+  createSkill("Physics");
+  createSkill("Language");
+  createSkill("Mathematics");
+  createSkill("Information Technology");
+  createSkill("Travel");
+  createSkill("Geography");
+  createSkill("Health and Fitness");
+};
+
+export const createSkill = skill => {
+  axios
+    .post(`${getApiRoute("skills/create/")}`, {
+      skill: skill
+    })
+    .then(result => {
+      console.log(result.data.data);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
+export const getAllSkills = () => {
+  axios
+    .get(`${getApiRoute("skills/")}`)
+    .then(result => {
+      const skills = result.data;
+      console.log(skills);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
+/* Lessons */
+export const getAllEvents = () => {
+  axios
+    .get(`${getApiRoute("events/")}`, getTokenConfig())
+    .then(result => {
+      const events = result.data;
+      console.log(events);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
+export const createEvent = (lesson_id, user_id, start_datetime) => {
+  axios
+    .post(`${getApiRoute("events/create/")}`, {
+      lesson_id: lesson_id,
+      user_id: user_id,
+      start_datetime: start_datetime
     })
     .then(result => {
       console.log(result.data.data);
