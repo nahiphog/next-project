@@ -52,7 +52,9 @@ def create():
                 'rating': lesson.rating,
                 'teach': lesson.teach,
                 'owner_id': lesson.owner_id,
+                'owner_name': lesson.owner.name,
                 'skill_id': lesson.skill_id,
+                'skill_name': lesson.skill.name,
                 'image_url': lesson.image_url
             }
             return success_201("New lesson created successfully", lesson) 
@@ -71,16 +73,42 @@ def index():
             'description': lesson.description,
             'rating': lesson.rating,
             'owner_id': lesson.owner_id,
+            'owner_name': lesson.owner.name,
             'teach': lesson.teach,
             'skill_id': lesson.skill_id,
+            'skill_name': lesson.skill.name,
             'image_url': lesson.image_url
         } for lesson in Lesson.select()
     ]
+    return success_200(lessons)
 
-    if lessons:
-        return success_200(lessons)
+@lessons_api_blueprint.route('/filter', methods=['GET'])
+def index_with_filter():
+    # Retrieve arguments
+    teach = request.args.get('teach')
+    if (teach == "true"):
+        teach_option = True
+    elif (teach == "false"):
+        teach_option = False
     else:
-        return error_404("No lessons found")
+        return error_401("Invalid teach input")
+
+    # Retrieve lessons from database
+    lessons = [ 
+        {
+            'id': lesson.id,
+            'title': lesson.title,
+            'description': lesson.description,
+            'rating': lesson.rating,
+            'owner_id': lesson.owner_id,
+            'owner_name': lesson.owner.name,
+            'teach': lesson.teach,
+            'skill_id': lesson.skill_id,
+            'skill_name': lesson.skill.name,
+            'image_url': lesson.image_url
+        } for lesson in Lesson.select().where(Lesson.teach == teach_option)
+    ]
+    return success_200(lessons)
 
 @lessons_api_blueprint.route('/<lesson_id>', methods=['GET'])
 def show(lesson_id):
@@ -95,7 +123,9 @@ def show(lesson_id):
             'rating': lesson.rating,
             'teach': lesson.teach,
             'owner_id': lesson.owner_id,
+            'owner_name': lesson.owner.name,
             'skill_id': lesson.skill_id,
+            'skill_name': lesson.skill.name,
             'image_url': lesson.image_url
         }
         return success_200(data)
@@ -135,28 +165,47 @@ def update(lesson_id):
 def search_lessons():
 
     search_value = request.args['search_value']
-    print(search_value)
+
+    teach_arg = request.args['teach']
+    print(f'========================================{teach_arg}========================================')
+    if str(teach_arg) == 'true':
+        teach=True
+    else:
+        teach=False
 
     list_of_skills = []
     final_lessons_list = []
     
-    split_search_value = search_value.split(" ")
+    split_search_value = search_value.lower().split(" ") #This is a list []
 
     for word in split_search_value: #loop through the split search string
-        for lesson in Lesson: #loop through all rows in Lesson
-            if lesson.teach:
-                if (word in lesson.title) or (word in lesson.skill): #if a word from the split search string is part of the lesson title, append it to a list
-                    final_lessons_list.append(lesson)
-    
-    data = [
-        {'lesson': {
+        for lesson in Lesson.select().where(Lesson.teach == teach): #loop through all rows in Lesson
+            if (word in lesson.title.lower()) or (word in lesson.skill.name.lower()) or (word in lesson.description.lower()): #if a word from the split search string is part of the lesson title, append it to a list
+                final_lessons_list.append(lesson)
+
+                    
+    if len(final_lessons_list) > 0:
+        print(f'-------------test7-----------------')
+        
+        data = [
+            {
             'id': lesson.id,
-            'description': lesson.decription,
+            'title': lesson.title,
+            'description': lesson.description,
             'rating': lesson.rating,
-            'owner': lesson.owner_id
-        }} for lesson in final_lessons_list
-    ]
-    return success_201('success testing', data)
+            'teach': lesson.teach,
+            'owner_id': lesson.owner_id,
+            'owner_name': lesson.owner.name,
+            'skill_id': lesson.skill_id,
+            'skill_name': lesson.skill.name,
+            'image_url': lesson.image_url
+            } for lesson in final_lessons_list
+        ]
+        print(f'-------------test8-----------------')
+
+        return success_201('success testing', data)
+    else:
+        return success_201('No lessons matched the search query', [])
     
 @lessons_api_blueprint.route('/add_image', methods=['POST'])
 @jwt_required
