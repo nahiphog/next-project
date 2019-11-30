@@ -13,7 +13,7 @@ import {
   ListItemIcon,
   ListItemText
 } from "@material-ui/core";
-import { Menu, ContactSupportOutlined } from "@material-ui/icons";
+import { Menu } from "@material-ui/icons";
 import MenuBookIcon from "@material-ui/icons/MenuBook";
 import InboxIcon from "@material-ui/icons/Inbox";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -51,6 +51,7 @@ export default function TopNav() {
     userStore: { currentUser, logout }
   } = useStores();
   const [open, setOpen] = useState(false);
+  const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
   const routeTo = option => {
@@ -65,7 +66,7 @@ export default function TopNav() {
   //profile picture if currentUser loggedIn
   function profilePicture() {
     if (currentUser.loggedIn) {
-      return [
+      return (
         <ListSubheader
           component="div"
           id="nested-list-subheader"
@@ -86,9 +87,9 @@ export default function TopNav() {
             </ListItemText>
           </ListItem>
         </ListSubheader>
-      ];
+      );
     } else {
-      return [
+      return (
         <ListSubheader
           component="div"
           id="nested-list-subheader"
@@ -107,14 +108,14 @@ export default function TopNav() {
             </ListItemText>
           </ListItem>
         </ListSubheader>
-      ];
+      );
     }
   }
 
   //sign in button if currentUser logged in
   function signInButton() {
     if (currentUser.loggedIn) {
-      return [
+      return (
         <ListItem
           button
           onClick={() => {
@@ -131,9 +132,9 @@ export default function TopNav() {
             Sign Out
           </ListItemText>
         </ListItem>
-      ];
+      );
     } else {
-      return [
+      return (
         <ListItem button onClick={() => routeTo(route.signinPage)}>
           <ListItemIcon>
             <ExitToAppIcon style={iconColor} />
@@ -142,7 +143,7 @@ export default function TopNav() {
             Sign Up / Login
           </ListItemText>
         </ListItem>
-      ];
+      );
     }
   }
   return (
@@ -243,6 +244,7 @@ export default function TopNav() {
       <DialogPage
         routeTo={routeTo}
         routeOption={routeOption}
+        routeArgs={routeArgs}
         dialogOpen={dialogOpen}
       />
     </>

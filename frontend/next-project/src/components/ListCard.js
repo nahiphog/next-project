@@ -12,37 +12,36 @@ const useStyles = makeStyles(theme => ({
     height: "180px",
     width: "98vw",
     borderRadius: 16,
-    border: "1px solid #1589FF", 
-    color:"#393333",
-    fontSize:"10px"
+    border: "1px solid #1589FF",
+    color: "#393333",
+    fontSize: "10px"
   },
   cover: {
-    width: 151
+    width: "40vw"
   }
 }));
 
-export default function ListCard() {
+export default function ListCard({ lesson }) {
   const classes = useStyles();
-  const value = 2;
-
   return (
-    <div style={{ display: "flex", justifyContent:"center"}}>
-    <Card className={classes.card}>
-      <CardMedia
-        className={classes.cover}
-        image="https://desmond-nextagram.s3-ap-southeast-1.amazonaws.com/cat4.png"
-        title="Live from space album cover"
-      />
-      <div>
-        <CardContent align="left">
-          <Typography>Title: Some Lesson</Typography>
-          <Typography>Author: Someone</Typography>
-          <Typography>Skill Categories: Computer Science</Typography>
-          <Typography>Lesson Rating:</Typography>
-          <Rating name="read-only" value={value} readOnly />
-        </CardContent>
-      </div>
-    </Card>
-    </div>
+    <>
+      <Card className={classes.card}>
+        <CardMedia
+          className={classes.cover}
+          image={lesson.image_url}
+          title="Lesson image"
+        />
+        <div>
+          <CardContent align="left" style={{ width: "60vw" }}>
+            <Typography>Title: {lesson.title}</Typography>
+            <Typography>Author: {lesson.owner_name}</Typography>
+            <Typography>Skill: {lesson.skill_name}</Typography>
+            <Typography>Lesson Rating:</Typography>
+            <Rating name="read-only" value={lesson.value} readOnly />
+          </CardContent>
+        </div>
+      </Card>
+      <br />
+    </>
   );
 }

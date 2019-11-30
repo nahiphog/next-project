@@ -3,7 +3,7 @@ import { getApiRoute, VERSION } from "../global";
 
 /* Functions */
 export const generateData = () => {
-  getVersion();
+  // getVersion();
   // getAllUsers();
   // getAllLessons();
   // getAllSkills();
@@ -11,8 +11,7 @@ export const generateData = () => {
   // getAllEvents();
   // generateSkillList();
   // generateLessonList();
-
-  // working
+  // getAllLessonsWithFilter(false);
   // createLesson("Machine Learning", "no description", "True", 3);
   // signUpUser("test1112", "test1112@email.com", "123");
   // createEvent(4, 13, "2019-11-26 14:58:03.603560");
@@ -119,10 +118,22 @@ export const getAllLessons = () => {
     });
 };
 
+export const getAllLessonsWithFilter = teach => {
+  axios
+    .get(`${getApiRoute("lessons/filter?")}teach=${teach}`)
+    .then(result => {
+      const lessons = result.data;
+      console.log(lessons);
+    })
+    .catch(error => {
+      console.log("ERROR: ", error);
+    });
+};
+
 export const generateLessonList = () => {
-  // signInUser("lee", "123");
-  // createLesson("Guitar", "Teach you how to play guitar in 5 mins", "True", 1);
-  // createLesson("Coding", "Teach you how to code in 5 seconds", "True", 1);
+  signInUser("lee2", "123");
+  createLesson("Guitar", "Teach you how to play guitar in 5 mins", "true", 2);
+  // createLesson("Coding", "Teach you how to code in 5 seconds", "true", 2);
   // createLesson(
   //   "Dancing",
   //   "Want to learn how to dance like Michael Jackson",
@@ -143,17 +154,15 @@ export const generateLessonList = () => {
 };
 
 export const createLesson = (newtitle, newdescription, newteach, newskill) => {
+  let formData = new FormData();
+  formData.append("title", newtitle);
+  formData.append("description", newdescription);
+  formData.append("skill", newskill);
+  formData.append("teach", newteach);
+  formData.append("image", null);
+
   axios
-    .post(
-      `${getApiRoute("lessons/create")}`,
-      {
-        title: newtitle,
-        description: newdescription,
-        teach: newteach,
-        skill: newskill
-      },
-      getTokenConfig()
-    )
+    .post(`${getApiRoute("lessons/create")}`, formData, getTokenConfig())
     .then(result => {
       console.log(result.data.data);
     })
