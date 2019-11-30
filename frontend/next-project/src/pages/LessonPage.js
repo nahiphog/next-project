@@ -17,7 +17,7 @@ const ContainerStyles = {
 };
 
 export default function LessonPage({ parentRouteArgs }) {
-  const [routeArgs, setRouteArgs] = useState([]);
+  const [routeArgs, setRouteArgs] = useState(parentRouteArgs);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
   const routeTo = option => {
@@ -36,7 +36,7 @@ export default function LessonPage({ parentRouteArgs }) {
           fullWidth
           aria-label="full width button group"
           style={{
-            position: "relative ",
+            position: "absolute",
             bottom: 0,
             height: "7vh"
           }}

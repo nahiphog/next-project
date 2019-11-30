@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Button, ButtonGroup } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
+import useStores from "../hooks/useStores";
 
 /* Import app components */
 import DialogPage from "../components/DialogPage";
@@ -19,6 +20,9 @@ const ContainerStyles = {
 };
 
 export default function CreateLessonPage({ parentRouteTo, teach }) {
+  const {
+    userStore: { getToken }
+  } = useStores();
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,26 +47,19 @@ export default function CreateLessonPage({ parentRouteTo, teach }) {
     formData.append("description", lessonInput.description);
     formData.append("skill", lessonInput.skill);
     formData.append("teach", teach);
-    formData.append("image", userFile[0]);
-
-    // Prepare token
-    const token = localStorage.getItem("userToken");
-    const config = {
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    };
+    if (userFile) {
+      formData.append("image", userFile[0]);
+    }
     axios
-      .post(`${getApiRoute("lessons/create")}`, formData, config)
+      .post(`${getApiRoute("lessons/create")}`, formData, getToken())
       .then(result => {
         // const id = result.data.data.id;
         console.log(result);
-        parentRouteTo(route.close);
       })
       .catch(error => {
         console.log("ERROR: ", error);
-        parentRouteTo(route.close);
       });
+    parentRouteTo(route.close);
   };
 
   return (

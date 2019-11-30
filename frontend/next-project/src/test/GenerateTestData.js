@@ -10,7 +10,7 @@ export const generateData = () => {
   // getUser(3);
   // getAllEvents();
   // generateSkillList();
-  // generateLessonList();
+  generateLessonList();
   // getAllLessonsWithFilter(false);
   // createLesson("Machine Learning", "no description", "True", 3);
   // signUpUser("test1112", "test1112@email.com", "123");
@@ -36,10 +36,17 @@ export const signInUser = (username, userpassword) => {
       password: userpassword
     })
     .then(result => {
+      const id = result.data.data.id;
+      const name = result.data.data.name;
+      const profile_picture = result.data.data.profile_picture;
+      const email = result.data.data.email;
       const access_token = result.data.data.access_token;
-      console.log(access_token);
+      // console.log(access_token);
+      localStorage.setItem("userName", JSON.stringify(name));
+      localStorage.setItem("userID", JSON.stringify(id));
+      localStorage.setItem("userPic", JSON.stringify(profile_picture));
+      localStorage.setItem("userEmail", JSON.stringify(email));
       localStorage.setItem("userToken", access_token);
-      localStorage.setItem("userData", JSON.stringify(username));
     })
     .catch(error => {
       console.log("ERROR: ", error);
@@ -131,15 +138,15 @@ export const getAllLessonsWithFilter = teach => {
 };
 
 export const generateLessonList = () => {
-  signInUser("lee2", "123");
-  createLesson("Guitar", "Teach you how to play guitar in 5 mins", "true", 2);
-  // createLesson("Coding", "Teach you how to code in 5 seconds", "true", 2);
-  // createLesson(
-  //   "Dancing",
-  //   "Want to learn how to dance like Michael Jackson",
-  //   "False",
-  //   1
-  // );
+  signInUser("test1112", "123");
+  createLesson("Guitar", "Teach you how to play guitar in 5 mins", "false", 2);
+  createLesson("Coding", "Teach you how to code in 5 seconds", "false", 2);
+  createLesson(
+    "Dancing",
+    "Want to learn how to dance like Michael Jackson",
+    "False",
+    1
+  );
   // signInUser("desmond", "123");
   // createLesson("Singing", "Teach you how to sing with your nose", "True", 2);
   // signInUser("melissa", "123");

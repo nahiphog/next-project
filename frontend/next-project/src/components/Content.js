@@ -1,7 +1,8 @@
 /* Import package components */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Grid, Button } from "@material-ui/core";
-import { route } from "../global";
+import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
 
@@ -11,7 +12,7 @@ import { generateData } from "../test/GenerateTestData";
 
 function Content() {
   const {
-    userStore: { currentUser, logout }
+    userStore: { currentUser, logout, checkUserLoggedIn }
   } = useStores();
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
@@ -24,6 +25,13 @@ function Content() {
     }
     setRouteOption(option);
   };
+  useEffect(() => {
+    // Check if user already logged in
+    if (!currentUser.loggedIn) {
+      checkUserLoggedIn();
+    }
+  }, []);
+
   return (
     <>
       <h1>Content</h1>
@@ -83,8 +91,6 @@ function Content() {
           variant="outlined"
           color="primary"
           onClick={() => {
-            localStorage.removeItem("userToken");
-            localStorage.removeItem("userData");
             console.log("sign out successfully");
             logout();
           }}
@@ -111,13 +117,6 @@ function Content() {
           onClick={() => routeTo(route.createTeachPage)}
         >
           CreateTeach
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => routeTo(route.createEventPage)}
-        >
-          CreateEvent
         </Button>
         <Button
           variant="outlined"
