@@ -1,7 +1,6 @@
 /* Import package components */
-import React, { useState, useEffect } from "react";
-import { route, getApiRoute } from "../global";
-import axios from "axios";
+import React, { useState } from "react";
+import { route } from "../global";
 
 /* Import app components */
 import DialogPage from "../components/DialogPage";
@@ -20,34 +19,8 @@ export default function BookmarkListPage() {
     }
     setRouteOption(option);
   };
-
-  const [lessonsData, setLessonsData] = useState({
-    datas: []
-  });
-  useEffect(() => {
-    const token = localStorage.getItem("userToken");
-    const config = {
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    };
-
-    axios
-      .get(`${getApiRoute("lessons/bookmarks")}`, config)
-      .then(result => {
-        console.log(result);
-        setLessonsData({
-          datas: result.data.data
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
-
   return (
     <div>
-      <h1>Bookmark Page</h1>
       <div style={{ width: "100vw" }}>
         <SearchBar />
       </div>
@@ -56,17 +29,7 @@ export default function BookmarkListPage() {
         id="cardBox"
         onClick={() => routeTo(route.lessonPage)}
       >
-        {lessonsData.datas.map((lessonData, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              setRouteArgs({ lesson: lessonData, showAction: true });
-              routeTo(route.lessonPage);
-            }}
-          >
-            <ListCard lesson={lessonData} />
-          </div>
-        ))}
+        <ListCard />
       </div>
       <DialogPage
         routeTo={routeTo}

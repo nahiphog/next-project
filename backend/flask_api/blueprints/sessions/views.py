@@ -15,6 +15,7 @@ def create():
     
     # Retrieve data from json
     data = request.get_json()
+    print(data)
 
     name = data['userSignIn']['name']
     password = data['userSignIn']['password']

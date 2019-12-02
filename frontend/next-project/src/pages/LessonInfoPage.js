@@ -48,8 +48,6 @@ export default function LessonInfoPage({ lesson }) {
   useEffect(() => {
     axios.get(`${getApiRoute("users/")}${lesson.owner_id}`).then(response => {
       const userLatitude = localStorage.getItem("userLatitude");
-
-    console.log(response)
       const userLongtitude = localStorage.getItem("userLongtitude");
 
       axios
@@ -57,9 +55,9 @@ export default function LessonInfoPage({ lesson }) {
           `https://graphhopper.com/api/1/matrix?point=${response.data.data.latitude},${response.data.data.longtitude}&point=${userLatitude},${userLongtitude}&type=json&vehicle=car&debug=true&out_array=weights&out_array=times&out_array=distances&key=5dcb6221-e534-491b-863b-3e1c72ab7264`
         )
         .then(result => {
-          // console.log(result);
+          console.log(result);
           const distancesArr = result.data.distances;
-          // console.log(distancesArr);
+          console.log(distancesArr);
           const allDistances = [];
           distancesArr.map(arr => {
             arr.map(val => {

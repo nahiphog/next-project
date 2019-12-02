@@ -39,10 +39,8 @@ export default function LessonListPage({ teach }) {
         for (let i = 0; i < lessonList.length; i++) {
           if (lessonList[i].owner_id !== currentUser.id) {
             newLessonList.push(lessonList[i]);
-            
           }
         }
-
         setLessonsData({
           datas: newLessonList
         });

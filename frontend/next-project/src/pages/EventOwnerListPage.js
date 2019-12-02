@@ -33,23 +33,12 @@ export default function EventOwnerListPage({ parentRouteTo }) {
         console.log("ERROR: ", error);
       });
   };
-  const handleAction = (event_id, action) => {
-    console.log(action);
-    axios
-      .post(
-        `${getApiRoute("events/")}${event_id}/status`,
-        { status: action },
-        getToken()
-      )
-      .then(result => {
-        // console.log(result);
-        console.log("approve/decline event successfully");
-        parentRouteTo(route.close);
-      })
-      .catch(error => {
-        console.log("ERROR: ", error);
-        parentRouteTo(route.close);
-      });
+  const handleApprove = () => {
+    console.log("approve");
+    parentRouteTo(route.close);
+  };
+  const handleDecline = () => {
+    console.log("decline");
     parentRouteTo(route.close);
   };
   const [eventList, setEventList] = useState([]);
@@ -58,7 +47,7 @@ export default function EventOwnerListPage({ parentRouteTo }) {
   } = useStores();
   useEffect(() => {
     axios
-      .get(`${getApiRoute("events/my")}?status=pending`, getToken())
+      .get(`${getApiRoute("events/my")}`, getToken())
       .then(result => {
         const eventlist = result.data.data.owner;
         setEventList(eventlist);
@@ -75,7 +64,8 @@ export default function EventOwnerListPage({ parentRouteTo }) {
           key={index}
           event={event}
           handleLinkLesson={handleLinkLesson}
-          handleAction={handleAction}
+          handleApprove={handleApprove}
+          handleDecline={handleDecline}
         />
       ))}
       {/* </div> */}
