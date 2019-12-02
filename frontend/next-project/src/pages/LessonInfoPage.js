@@ -48,6 +48,8 @@ export default function LessonInfoPage({ lesson }) {
   useEffect(() => {
     axios.get(`${getApiRoute("users/")}${lesson.owner_id}`).then(response => {
       const userLatitude = localStorage.getItem("userLatitude");
+
+    console.log(response)
       const userLongtitude = localStorage.getItem("userLongtitude");
 
       axios
