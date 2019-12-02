@@ -1,7 +1,7 @@
 /* Import package components */
 import React, { useState } from "react";
 import axios from "axios";
-import { Button, ButtonGroup } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 
@@ -27,7 +27,6 @@ export default function RatingPage({ parentRouteTo }) {
     comment: ""
   });
   const handleSubmit = () => {
-    console.log(userReview);
     const event_id = 3; //hardcode
     axios
       .post(
@@ -36,7 +35,7 @@ export default function RatingPage({ parentRouteTo }) {
         getToken()
       )
       .then(result => {
-        console.log(result);
+        // console.log(result);
         console.log("submit rating successfully");
         parentRouteTo(route.close);
       })
@@ -47,25 +46,24 @@ export default function RatingPage({ parentRouteTo }) {
   };
   return (
     <>
-      <div style={{ position: "relative", top: "150px" }}>
+      <div style={ContainerStyles}>
+      <div style={{ marginTop: "150px" }}>
         <RatingInputForm
           userReview={userReview}
           setUserReview={setUserReview}
         />
       </div>
-      <div style={ContainerStyles}>
-        <ButtonGroup
-          fullWidth
-          aria-label="full width button group"
-          style={{ position: "fixed", bottom: "0", height: "7vh" }}
-        >
           <Button
             onClick={() => parentRouteTo(route.close)}
             style={{
-              backgroundColor: "#f08080",
-              color: "#721C24",
+              backgroundColor: "#ff0000",
+              color: "#FFFFFF",
               fontSize: "16px",
-              borderRadius: 0
+              borderRadius: 16,
+              fontWeight: "bold",
+              height: "45px",
+              width: 360,
+              marginTop: "15px"
             }}
           >
             Cancel
@@ -73,15 +71,18 @@ export default function RatingPage({ parentRouteTo }) {
           <Button
             onClick={handleSubmit}
             style={{
-              backgroundColor: "#5CB3FF",
-              color: "#004085",
+              backgroundColor: "#1589FF",
+              color: "#FFFFFF",
               fontSize: "16px",
-              borderRadius: 0
+              borderRadius: 16,
+              fontWeight: "bold",
+              height: "45px",
+              width: 360,
+              marginTop: "5px"
             }}
           >
             Submit
           </Button>
-        </ButtonGroup>
       </div>
     </>
   );

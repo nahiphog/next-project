@@ -1,7 +1,7 @@
 /* Import package components */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, ButtonGroup } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
@@ -36,9 +36,9 @@ function SignInPage({ parentRouteTo }) {
     navigator.geolocation.getCurrentPosition(
       position => {
         setLatitude(position.coords.latitude);
-        console.log(position.coords.latitude);
+        // console.log(position.coords.latitude);
         setLongtitude(position.coords.longitude);
-        console.log(longtitude);
+        // console.log(longtitude);
         // const location = JSON.stringify(position);
       },
       error => console.log(error.message),
@@ -47,7 +47,6 @@ function SignInPage({ parentRouteTo }) {
   }, []);
 
   const handleSignIn = () => {
-
     axios
       .post(`${getApiRoute("sessions/signin")}`, {
         userSignIn,
@@ -60,14 +59,21 @@ function SignInPage({ parentRouteTo }) {
         const profile_picture = result.data.data.profile_picture;
         const email = result.data.data.email;
         const access_token = result.data.data.access_token;
-        console.log(result);
+        // console.log(result);
         console.log("sign in successfully");
-        login(name, id, profile_picture, email, access_token, latitude, longtitude);
+        login(
+          name,
+          id,
+          profile_picture,
+          email,
+          access_token,
+          latitude,
+          longtitude
+        );
       })
       .catch(error => {
         console.log("ERROR: ", error);
       });
-    console.log("gtest");
     parentRouteTo(route.close);
   };
   return (
@@ -81,21 +87,20 @@ function SignInPage({ parentRouteTo }) {
         <a
           href="#"
           onClick={() => parentRouteTo(route.signupPage)}
-          style={{ fontSize: "15px", marginTop: "25px", color:"#1589FF"  }}
+          style={{ fontSize: "15px", marginTop: "25px", color: "#1589FF" }}
         >
           No account? Sign up now!
         </a>
-        <ButtonGroup
-          fullWidth
-          aria-label="full width button group"
-          style={{ position: "absolute", bottom: 0, height: "60px" }}
-        >
           <Button
             style={{
-              backgroundColor: "#f08080",
-              color: "#721C24",
+              backgroundColor: "#ff0000",
+              color: "#FFFFFF",
               fontSize: "16px",
-              borderRadius: 0
+              borderRadius: 16,
+              fontWeight: "bold",
+              height: "45px",
+              width: 360,
+              marginTop: "15px"
             }}
             onClick={() => parentRouteTo(route.close)}
           >
@@ -103,16 +108,19 @@ function SignInPage({ parentRouteTo }) {
           </Button>
           <Button
             style={{
-              backgroundColor: "#5CB3FF",
-              color: "#004085",
+              backgroundColor: "#1589FF",
+              color: "#FFFFFF",
               fontSize: "16px",
-              borderRadius: 0
+              borderRadius: 16,
+              fontWeight: "bold",
+              height: "45px",
+              width: 360,
+              marginTop: "5px"
             }}
             onClick={handleSignIn}
           >
             Sign In
           </Button>
-        </ButtonGroup>
       </div>
     </>
   );

@@ -2,13 +2,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { route, getApiRoute } from "../global";
+import useStores from "../hooks/useStores";
 
 /* Import app components */
 import DialogPage from "../components/DialogPage";
 import SearchBar from "../components/SearchBar";
-import ListCard from "../components/ListCard";
+import ListCard from "../pages/ListCard";
 
 export default function LessonListPage({ teach }) {
+  const {
+    userStore: { currentUser }
+  } = useStores();
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,9 +32,17 @@ export default function LessonListPage({ teach }) {
     axios
       .get(`${getApiRoute("lessons/filter?")}teach=${teach}`)
       .then(result => {
-        console.log(result.data);
+        let lessonList = result.data;
+        let newLessonList = [];
+
+        // Filter out lessons that belong to user
+        for (let i = 0; i < lessonList.length; i++) {
+          if (lessonList[i].owner_id !== currentUser.id) {
+            newLessonList.push(lessonList[i]);
+          }
+        }
         setLessonsData({
-          datas: result.data
+          datas: newLessonList
         });
       })
       .catch(error => {
@@ -41,21 +53,26 @@ export default function LessonListPage({ teach }) {
   return (
     <div>
       <div style={{ width: "100vw" }}>
-        <SearchBar setLessonsData={setLessonsData} teach={teach}/>
+        <SearchBar setLessonsData={setLessonsData} teach={teach} />
       </div>
       <div
-        style={{ marginTop: "10px", display: "grid", justifyContent: "center", gridGap:"10px" }}
+        style={{
+          marginTop: "10px",
+          display: "grid",
+          justifyContent: "center",
+          gridGap: "10px"
+        }}
         id="cardBox"
       >
-        {lessonsData.datas.map(lesson => (
+        {lessonsData.datas.map((lessonData, index) => (
           <div
-            key={lesson.id}
+            key={index}
             onClick={() => {
+              setRouteArgs({ lesson: lessonData, showAction: true });
               routeTo(route.lessonPage);
-              setRouteArgs(lesson);
             }}
           >
-            <ListCard lesson={lesson} />
+            <ListCard lesson={lessonData} />
           </div>
         ))}
       </div>
