@@ -5,5 +5,5 @@ versions_api_blueprint = Blueprint('versions_api', __name__)
 
 @versions_api_blueprint.route('/', methods=['GET'])
 def index():
-    version = 8
+    version = 7
     return success_200(version)

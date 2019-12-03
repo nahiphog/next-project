@@ -12,7 +12,6 @@ import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-
 /* Import app components */
 import DialogPage from "../components/DialogPage";
 
@@ -32,26 +31,16 @@ function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
     setRouteOption(option);
   };
 
-  /* Date Picker */
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const handleDateChange = date => {
-    setSelectedDate(date);
-  };
-  const theme = createMuiTheme({
-    palette: {
-      secondary: { main: "#1589FF" }
-    }
-  });
-
   const handleCreate = () => {
-    const lesson = parentRouteArgs.lesson;
+    const lesson = parentRouteArgs;
+    console.log("date: " + selectedDate);
     axios
       .post(
         `${getApiRoute("events/create")}`,
         {
           lesson_id: lesson.id,
           user_id: currentUser.id,
-          start_datetime: selectedDate
+          start_datetime: "2019-11-30 14:13:03.603560"
         },
         getToken()
       )
@@ -74,6 +63,16 @@ function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
     width: "100%"
   };
 
+  /* Date Picker */
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const handleDateChange = date => {
+    setSelectedDate(date);
+  };
+  const theme = createMuiTheme({
+    palette: {
+      secondary: { main: "#1589FF" }
+    }
+  });
   return (
     <>
       <MuiThemeProvider theme={theme}>

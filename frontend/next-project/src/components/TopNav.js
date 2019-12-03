@@ -72,7 +72,6 @@ export default function TopNav() {
           component="div"
           id="nested-list-subheader"
           style={backGround}
-          disableSticky={true}
         >
           <ListItem button>
             <ListItemIcon>
@@ -96,7 +95,6 @@ export default function TopNav() {
           component="div"
           id="nested-list-subheader"
           style={backGround}
-          disableSticky={true}
         >
           <ListItem button>
             <ListItemIcon>

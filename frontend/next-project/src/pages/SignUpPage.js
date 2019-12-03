@@ -8,7 +8,6 @@ import { observer } from "mobx-react";
 
 /* Import app components */
 import SignUpInputForm from "../pages/SignUpInputForm";
-import LoadingNav from "../components/LoadingNav";
 
 /* CSS Styles */
 const ContainerStyles = {
@@ -26,7 +25,6 @@ function SignUpPage({ parentRouteTo }) {
     email: "",
     password: ""
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     userStore: { login }
@@ -37,33 +35,30 @@ function SignUpPage({ parentRouteTo }) {
     axios
       .post(`${getApiRoute("users/signup")}`, userSignUp)
       .then(result => {
+        const id = result.data.data.id;
+        const name = result.data.data.name;
+        const profile_picture = result.data.data.profile_picture;
+        const email = result.data.data.email;
+        const access_token = result.data.data.access_token;
         // console.log(result);
         console.log("sign up successfully");
+        login(name, id, profile_picture, email, access_token);
       })
       .catch(error => {
         console.log("ERROR: ", error);
       });
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      parentRouteTo(route.close);
-      console.log("setTimeOut");
-    }, 2000);
+    parentRouteTo(route.close);
   };
-  //loader
-  if (isLoading) {
-    return <LoadingNav />;
-  }
   return (
     <>
       <div style={ContainerStyles}>
-        <img
-          src={require("../media/peerskill512.png")}
-          style={{
-            width: "240px",
-            height: "240px"
-          }}
-        />
+      <img
+              src={require('../media/peerskill512.png')}
+              style={{
+                width: "240px",
+                height: "240px"
+              }}
+            />
         <SignUpInputForm
           userSignUp={userSignUp}
           setUserSignUp={setUserSignUp}
