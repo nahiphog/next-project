@@ -1,0 +1,1 @@
+heroku run python migrate.py --app next-project
