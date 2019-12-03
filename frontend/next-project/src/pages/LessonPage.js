@@ -1,7 +1,8 @@
 /* Import package components */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@material-ui/core";
-import { route } from "../global";
+import { route, getApiRoute } from "../global";
+import axios from "axios";
 
 /* Import app components */
 import DialogPage from "../components/DialogPage";
@@ -17,6 +18,7 @@ const ContainerStyles = {
 };
 
 export default function LessonPage({ parentRouteArgs }) {
+  const [bookmark, setBookmark] = useState(null);
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,50 +30,118 @@ export default function LessonPage({ parentRouteArgs }) {
     }
     setRouteOption(option);
   };
-  //sign in button if currentUser logged in
+
+  useEffect(() => {
+    axios
+      .get(`${getApiRoute("bookmarks/")}${parentRouteArgs.lesson.id}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("userToken")
+        }
+      })
+      .then(result => {
+        setBookmark(result.data.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
+
+  const createBookmark = e => {
+    e.preventDefault();
+    const token = localStorage.getItem("userToken");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    };
+    axios
+      .post(
+        `${getApiRoute("bookmarks/create")}`,
+        {
+          lesson_id: parentRouteArgs.lesson.id
+        },
+        config
+      )
+      .then(() => {
+        setBookmark(true);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const deleteBookmark = e => {
+    e.preventDefault();
+    const token = localStorage.getItem("userToken");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    };
+    axios
+      .post(
+        `${getApiRoute("bookmarks/delete")}`,
+        {
+          lesson_id: parentRouteArgs.lesson.id
+        },
+        config
+      )
+      .then(setBookmark(null))
+      .catch(error => {
+        console.log(error);
+      });
+  };
   function actionButton() {
     if (parentRouteArgs.showAction) {
       return (
         <>
-          <Button
-            style={{
-              backgroundColor: "#ffd100",
-              color: "#FFFFFF",
-              fontSize: "18px",
-              borderRadius:  16,
-              marginTop: "5px",
-              height:"45px",
-              width: 360,
-              fontWeight: "bold"
-            }}
-            onClick={() => routeTo(route.todo)}
-          >
-            Bookmark
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#1589FF",
-              color: "#FFFFFF",
-              fontSize: "18px",
-              borderRadius:  16,
-              marginTop: "5px",
-              height:"45px",
-              width: 360,
-              fontWeight: "bold"
-            }}
-            onClick={() => routeTo(route.todo)}
-          >
-            Chat
-          </Button>
+          {!bookmark ? (
+            <Button
+              style={{
+                backgroundColor: "#ffd100",
+                color: "#FFFFFF",
+                fontSize: "18px",
+                borderRadius: 16,
+                marginTop: "5px",
+                height: "45px",
+                width: 360,
+                fontWeight: "bold"
+              }}
+              onClick={e => {
+                createBookmark(e);
+              }}
+            >
+              Bookmark
+            </Button>
+          ) : (
+            <Button
+              style={{
+                backgroundColor: "#ff3333",
+                color: "#FFFFFF",
+                fontSize: "18px",
+                borderRadius: 16,
+                marginTop: "5px",
+                height: "45px",
+                width: 360,
+                fontWeight: "bold"
+              }}
+              onClick={e => {
+                deleteBookmark(e);
+              }}
+            >
+              Unbookmark
+            </Button>
+          )}
+
           <Button
             style={{
               backgroundColor: "#32cd32",
               color: "#FFFFFF",
               fontSize: "18px",
-              borderRadius:  16,
+              borderRadius: 16,
               marginTop: "5px",
               marginBottom: "20px",
-              height:"45px",
+              height: "45px",
               width: 360,
               fontWeight: "bold"
             }}

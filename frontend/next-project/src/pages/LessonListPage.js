@@ -8,6 +8,7 @@ import useStores from "../hooks/useStores";
 import DialogPage from "../components/DialogPage";
 import SearchBar from "../components/SearchBar";
 import ListCard from "../pages/ListCard";
+import LoadingNav from "../components/LoadingNav";
 
 export default function LessonListPage({ teach }) {
   const {
@@ -16,6 +17,8 @@ export default function LessonListPage({ teach }) {
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+  
   const routeTo = option => {
     if (option === route.close) {
       setDialogOpen(false);
@@ -24,6 +27,7 @@ export default function LessonListPage({ teach }) {
     }
     setRouteOption(option);
   };
+
   const [lessonsData, setLessonsData] = useState({
     datas: []
   });
@@ -39,17 +43,23 @@ export default function LessonListPage({ teach }) {
         for (let i = 0; i < lessonList.length; i++) {
           if (lessonList[i].owner_id !== currentUser.id) {
             newLessonList.push(lessonList[i]);
+            
           }
         }
         setLessonsData({
           datas: newLessonList
         });
+       setIsLoading(false)
+
       })
       .catch(error => {
         console.log("ERROR: ", error);
       });
   }, []);
 
+  if(isLoading){
+    return <LoadingNav />
+  }
   return (
     <div>
       <div style={{ width: "100vw" }}>

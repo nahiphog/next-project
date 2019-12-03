@@ -52,42 +52,72 @@ export default function SearchBar({ setLessonsData, teach }) {
         console.log(err);
       });
   };
-
   const handleChange = event => {
     setSearchValue(event.target.value);
   };
+  const renderSpeech = record => {
+    if (navigator.platform !== "iPhone") {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition; //Initialize SpeechRecognition
+      const recognition = new SpeechRecognition(); // Create an instance
 
-  // Voice recognition stuff----------------------------------------------
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition; //Initialize SpeechRecognition
-  const recognition = new SpeechRecognition(); // Create an instance
+      recognition.continuous = true; //Custom settings for recognition
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-  recognition.continuous = true; //Custom settings for recognition
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
+      recognition.onresult = function(event) {
+        //When a valid word(s) is detected, this function will run
+        var text = event.results[0][0].transcript;
+        setSearchValue(text);
+        console.log(text);
+      };
 
-  recognition.onresult = function(event) {
-    //When a valid word(s) is detected, this function will run
-    var text = event.results[0][0].transcript;
-    setSearchValue(text);
-    // console.log(text);
-  };
+      const startRecording = e => {
+        //when a button is clicked, this will start the recording
+        e.preventDefault();
+        console.log("activated");
 
-  const startRecording = e => {
-    //when a button is clicked, this will start the recording
-    e.preventDefault();
-    // console.log("activated");
+        recognition.start();
+      };
 
-    recognition.start();
-  };
+      const stopRecording = e => {
+        //when a button is clicked, this will stop the browser from recording
+        e.preventDefault();
+        console.log("stopped");
 
-  const stopRecording = e => {
-    //when a button is clicked, this will stop the browser from recording
-    e.preventDefault();
-    // console.log("stopped");
-
-    recognition.stop();
+        recognition.stop();
+      };
+      if (record) {
+        return (
+          <IconButton
+            type="submit"
+            className={classes.iconButton}
+            aria-label="search"
+            onClick={e => {
+              stopRecording(e);
+              setRecord(false);
+            }}
+          >
+            <MicIcon style={{ color: "1589FF" }} />
+          </IconButton>
+        );
+      } else {
+        return (
+          <IconButton
+            type="submit"
+            className={classes.iconButton}
+            aria-label="search"
+            onClick={e => {
+              startRecording(e);
+              setRecord(true);
+            }}
+          >
+            <MicIcon />
+          </IconButton>
+        );
+      }
+    }
   };
   return (
     <div
@@ -118,31 +148,7 @@ export default function SearchBar({ setLessonsData, teach }) {
           <SearchIcon />
         </IconButton>
         <Divider orientation="vertical" />
-        {record ? (
-          <IconButton
-            type="submit"
-            className={classes.iconButton}
-            aria-label="search"
-            onClick={e => {
-              stopRecording(e);
-              setRecord(false);
-            }}
-          >
-            <MicIcon style={{ color: "1589FF" }} />
-          </IconButton>
-        ) : (
-          <IconButton
-            type="submit"
-            className={classes.iconButton}
-            aria-label="search"
-            onClick={e => {
-              startRecording(e);
-              setRecord(true);
-            }}
-          >
-            <MicIcon />
-          </IconButton>
-        )}
+        {renderSpeech(record)}
       </Paper>
     </div>
   );

@@ -5,6 +5,7 @@ from flask_api.util.response import *
 from models.user import User
 from models.lesson import Lesson
 from models.skill import Skill
+from models.bookmark import Bookmark
 from werkzeug.utils import secure_filename
 
 lessons_api_blueprint = Blueprint('lessons_api', __name__)
@@ -167,7 +168,6 @@ def search_lessons():
     search_value = request.args['search_value']
 
     teach_arg = request.args['teach']
-    print(f'========================================{teach_arg}========================================')
     if str(teach_arg) == 'true':
         teach=True
     else:
@@ -185,7 +185,6 @@ def search_lessons():
 
                     
     if len(final_lessons_list) > 0:
-        print(f'-------------test7-----------------')
         
         data = [
             {
@@ -201,7 +200,6 @@ def search_lessons():
             'image_url': lesson.image_url
             } for lesson in final_lessons_list
         ]
-        print(f'-------------test8-----------------')
 
         return success_201('success testing', data)
     else:
@@ -227,4 +225,10 @@ def add_image():
             return error_401('Requested data is not JSON or not found!')
     else:
         error_401('User not found!')
+
+
+
     
+
+
+
