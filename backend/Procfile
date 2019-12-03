@@ -1,1 +1,1 @@
-heroku run python migrate.py --app next-project
+eb: python migrate.py; gunicorn start:app --preload
