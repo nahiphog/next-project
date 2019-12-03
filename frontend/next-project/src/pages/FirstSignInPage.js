@@ -5,8 +5,13 @@ import { Button } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
+import { Container, TextField } from "@material-ui/core";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import DialogPage from "../components/DialogPage";
+import Toolbar from "@material-ui/core/Toolbar";
 
 /* Import app components */
+import LoadingNav from "../components/LoadingNav";
 import SignInInputForm from "../pages/SignInInputForm";
 
 /* CSS Styles */
@@ -19,7 +24,18 @@ const ContainerStyles = {
   overflow: "auto"
 };
 
-function SignInPage({ parentRouteTo }) {
+const navBackgroundColor = {
+  backgroundColor: "#1589FF",
+  textAlign: "center"
+};
+
+const theme = createMuiTheme({
+  palette: {
+    secondary: { main: "#1589FF" }
+  }
+});
+
+function FirstSignIn() {
   const [userSignIn, setUserSignIn] = useState({
     name: "",
     password: ""
@@ -29,6 +45,19 @@ function SignInPage({ parentRouteTo }) {
     userStore: { login }
   } = useStores();
 
+  const [open, setOpen] = useState(false);
+  const [routeArgs, setRouteArgs] = useState([]);
+  const [routeOption, setRouteOption] = useState(route.close);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const routeTo = option => {
+    if (option === route.close) {
+      setDialogOpen(false);
+    } else {
+      setDialogOpen(true);
+    }
+    setRouteOption(option);
+  };
   const [latitude, setLatitude] = useState(null);
   const [longtitude, setLongtitude] = useState(null);
 
@@ -67,10 +96,26 @@ function SignInPage({ parentRouteTo }) {
       .catch(error => {
         console.log("ERROR: ", error);
       });
-    parentRouteTo(route.close);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
   };
+  if (isLoading) {
+    return <LoadingNav />;
+  }
   return (
     <>
+      <div style={navBackgroundColor}>
+        <Toolbar
+          style={{ display: "flex", width: "100vw", justifyContent: "center" }}
+        >
+          <div style={{ width: "100vw", justifyContent: "center" }}>
+            <h2 style={{ color: "white" }}>Sign In</h2>
+          </div>
+        </Toolbar>
+      </div>
+
       <div style={ContainerStyles}>
         <img
           src={require("../media/peerskill512.png")}
@@ -83,9 +128,10 @@ function SignInPage({ parentRouteTo }) {
           userSignIn={userSignIn}
           setUserSignIn={setUserSignIn}
         />
+
         <a
           href="#"
-          onClick={() => parentRouteTo(route.signupPage)}
+          onClick={() => routeTo(route.signupPage)}
           style={{ fontSize: "15px", marginTop: "25px", color: "#1589FF" }}
         >
           No account? Sign up now!
@@ -107,8 +153,14 @@ function SignInPage({ parentRouteTo }) {
           Sign In
         </Button>
       </div>
+      <DialogPage
+        routeTo={routeTo}
+        routeOption={routeOption}
+        routeArgs={routeArgs}
+        dialogOpen={dialogOpen}
+      />
     </>
   );
 }
 
-export default observer(SignInPage);
+export default observer(FirstSignIn);
