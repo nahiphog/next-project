@@ -1,6 +1,6 @@
 /* Import package components */
 import React, { useState, useEffect } from "react";
-import { Grid, Button } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
@@ -13,10 +13,9 @@ import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import LessonCard from "../components/LessonCard";
 
-
 /* Import app components */
 import DialogPage from "../components/DialogPage";
-
+import LoadingNav from "../components/LoadingNav";
 
 const FeaturedPage = styled.div`
   height: 22vh;
@@ -40,22 +39,23 @@ const CardInCard = styled.div`
   border: 1px solid #1589ff;
   border-radius: 1px;
   height: 100%;
-  background-color:white;
+  background-color: white;
 `;
- const HeaderTitle = styled.div`
+const HeaderTitle = styled.div`
   padding: 5px;
   color: #4c4c4c;
   font-size: 24px;
   font-weight: 550;
- `
+`;
 
 function Content() {
   const {
-    userStore: { currentUser, logout, checkUserLoggedIn }
+    userStore: { currentUser }
   } = useStores();
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const routeTo = option => {
     if (option === route.close) {
       setDialogOpen(false);
@@ -64,13 +64,6 @@ function Content() {
     }
     setRouteOption(option);
   };
-  useEffect(() => {
-    // Check if user already logged in
-    if (!currentUser.loggedIn) {
-      checkUserLoggedIn();
-    }
-  }, []);
-
   const Featuredsettings = {
     infinite: true,
     slidesToShow: 1,
@@ -88,11 +81,11 @@ function Content() {
   };
 
   const [TeachsData, setTeachsData] = useState({
-    Teachdata:[]
+    Teachdata: []
   });
 
   const [LearnsData, setLearnsData] = useState({
-    Learndata:[]
+    Learndata: []
   });
 
   useEffect(() => {
@@ -107,10 +100,11 @@ function Content() {
             newLessonList.push(lessonList[i]);
           }
         }
-        console.log(newLessonList)
+        // console.log(newLessonList)
         setLearnsData({
           Learndata: newLessonList
         });
+        setIsLoading(false);
       })
       .catch(error => {
         console.log("ERROR: ", error);
@@ -130,103 +124,114 @@ function Content() {
             newLessonList.push(lessonList[i]);
           }
         }
-        console.log(newLessonList)
+        // console.log(newLessonList);
         setTeachsData({
           Teachdata: newLessonList
         });
+        setIsLoading(false);
       })
       .catch(error => {
         console.log("ERROR: ", error);
       });
   }, []);
 
+  if (isLoading) {
+    return <LoadingNav />;
+  }
   return (
     <>
       <Grid item>
-      <FeaturedPageWrapper style={{paddingTop:"12px"}}>
-        <Slider {...Featuredsettings}>
-          <FeaturedPage>
-            <img
-              src={require('../media/fea1.png')}
-              style={{
-                width: "100%",
-                height: "100%"
-              }}
-            />
-          </FeaturedPage>
-          <FeaturedPage>
-          <img
-              src={require('../media/fea2.png')}
-              style={{
-                width: "100%",
-                height: "100%"
-              }}
-            />
-          </FeaturedPage>
-          <FeaturedPage>
-            <img
-              src={require('../media/fea3.png')}
-              style={{
-                width: "100%",
-                height: "100%"
-              }}
-            />
-          </FeaturedPage>
-        </Slider>
-        <HeaderTitle style={{ paddingTop:"25px", color:"#1589FF" }}>Learn</HeaderTitle>
-        <div style={{ backgroundColor:"#e2e2e2"}}>
-        <Slider {...Cardsettings}>
-          <CardPage>
-            <CardInCard onClick={() => routeTo(route.createLearnPage)} > 
-              <IconButton style={{ height: "100%", width: "100%" }}>
-                <AddIcon style={{ color: "1589FF", fontSize: "62px" }} />
-              </IconButton>
-            </CardInCard>
-          </CardPage>
-          {LearnsData.Learndata.map(lessonData => (
-            <div
-            key={lessonData.id}
-            onClick={() => {
-              setRouteArgs({ lesson: lessonData, showAction: true });
-              routeTo(route.lessonPage);
-            }}
-          > 
-          <LessonCard lessonData={lessonData}/>
+        <FeaturedPageWrapper style={{ paddingTop: "12px" }}>
+          <Slider {...Featuredsettings}>
+            <FeaturedPage>
+              <img
+                src={require("../media/fea1.png")}
+                style={{
+                  width: "100%",
+                  height: "100%"
+                }}
+                alt="Feature 1"
+              />
+            </FeaturedPage>
+            <FeaturedPage>
+              <img
+                src={require("../media/fea2.png")}
+                style={{
+                  width: "100%",
+                  height: "100%"
+                }}
+                alt="Feature 2"
+              />
+            </FeaturedPage>
+            <FeaturedPage>
+              <img
+                src={require("../media/fea3.1.png")}
+                style={{
+                  width: "100%",
+                  height: "100%"
+                }}
+                alt="Feature 3"
+              />
+            </FeaturedPage>
+          </Slider>
+          <HeaderTitle style={{ paddingTop: "25px", color: "#1589FF" }}>
+            What would you like to learn?
+          </HeaderTitle>
+          <div style={{ backgroundColor: "#e2e2e2" }}>
+            <Slider {...Cardsettings}>
+              <CardPage>
+                <CardInCard onClick={() => routeTo(route.createLearnPage)}>
+                  <IconButton style={{ height: "100%", width: "100%" }}>
+                    <AddIcon style={{ color: "1589FF", fontSize: "62px" }} />
+                  </IconButton>
+                </CardInCard>
+              </CardPage>
+              {LearnsData.Learndata.map(lessonData => (
+                <div
+                  key={lessonData.id}
+                  onClick={() => {
+                    setRouteArgs({ lesson: lessonData, showAction: true });
+                    routeTo(route.lessonPage);
+                  }}
+                >
+                  <LessonCard lessonData={lessonData} />
+                </div>
+              ))}
+            </Slider>
           </div>
-          ))}
-        </Slider>
-        </div>
-        <HeaderTitle style={{ paddingTop:"45px", color:"#1589FF" }}> Teach</HeaderTitle>
-        <div style={{ backgroundColor:"#e2e2e2"}}>
-        <Slider {...Cardsettings}>
-          <CardPage>
-            <CardInCard onClick={() => routeTo(route.createTeachPage)}>
-              <IconButton style={{ height: "100%", width: "100%" }}>
-                <AddIcon style={{ color: "1589FF", fontSize: "62px" }} />
-              </IconButton>
-            </CardInCard>
-          </CardPage>
-          {TeachsData.Teachdata.map(lessonData => (
-            <div
-            key={lessonData.id}
-            onClick={() => {
-              setRouteArgs({ lesson: lessonData, showAction: true });
-              routeTo(route.lessonPage);
-            }}
-          > 
-          <LessonCard lessonData={lessonData}/>
+          <HeaderTitle style={{ paddingTop: "45px", color: "#1589FF" }}>
+            What would you like to teach?
+          </HeaderTitle>
+          <div style={{ backgroundColor: "#e2e2e2" }}>
+            <Slider {...Cardsettings}>
+              <CardPage>
+                <CardInCard onClick={() => routeTo(route.createTeachPage)}>
+                  <IconButton style={{ height: "100%", width: "100%" }}>
+                    <AddIcon style={{ color: "1589FF", fontSize: "62px" }} />
+                  </IconButton>
+                </CardInCard>
+              </CardPage>
+              {TeachsData.Teachdata.map(lessonData => (
+                <div
+                  key={lessonData.id}
+                  onClick={() => {
+                    setRouteArgs({ lesson: lessonData, showAction: true });
+                    routeTo(route.lessonPage);
+                  }}
+                >
+                  <LessonCard lessonData={lessonData} />
+                </div>
+              ))}
+            </Slider>
           </div>
-          ))}
-        </Slider>
-        </div>
-      </FeaturedPageWrapper>
+        </FeaturedPageWrapper>
       </Grid>
       <DialogPage
         routeTo={routeTo}
         routeOption={routeOption}
         routeArgs={routeArgs}
         dialogOpen={dialogOpen}
-        />
+      />
     </>
   );
 }

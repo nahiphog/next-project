@@ -3,11 +3,20 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Button } from "@material-ui/core";
 import { route, getApiRoute } from "../global";
-import useStores from "../hooks/useStores";
-import { observer } from "mobx-react";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Slide from "@material-ui/core/Slide";
 
 /* Import app components */
 import SignUpInputForm from "../pages/SignUpInputForm";
+import LoadingNav from "../components/LoadingNav";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 /* CSS Styles */
 const ContainerStyles = {
@@ -19,46 +28,64 @@ const ContainerStyles = {
   overflow: "auto"
 };
 
-function SignUpPage({ parentRouteTo }) {
+export default function SignUpPage({ parentRouteTo }) {
   const [userSignUp, setUserSignUp] = useState({
     name: "",
     email: "",
     password: ""
   });
 
-  const {
-    userStore: { login }
-  } = useStores();
+  const [open, setOpen] = useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
+  const [isLoading, setIsLoading] = useState(false);
   const handleSignUp = () => {
+    var success = false;
     // console.log(userSignUp);
     axios
       .post(`${getApiRoute("users/signup")}`, userSignUp)
       .then(result => {
-        const id = result.data.data.id;
-        const name = result.data.data.name;
-        const profile_picture = result.data.data.profile_picture;
-        const email = result.data.data.email;
-        const access_token = result.data.data.access_token;
         // console.log(result);
         console.log("sign up successfully");
-        login(name, id, profile_picture, email, access_token);
+        success = true;
       })
       .catch(error => {
         console.log("ERROR: ", error);
+        handleClickOpen();
+        setUserSignUp({
+          name: "",
+          email: "",
+          password: ""
+        });
       });
-    parentRouteTo(route.close);
+    setIsLoading(true);
+    setTimeout(() => {
+      if (success) {
+        parentRouteTo(route.close);
+      }
+      setIsLoading(false);
+    }, 2000);
   };
+  //loader
+  if (isLoading) {
+    return <LoadingNav />;
+  }
   return (
     <>
       <div style={ContainerStyles}>
-      <img
-              src={require('../media/peerskill512.png')}
-              style={{
-                width: "240px",
-                height: "240px"
-              }}
-            />
+        <img
+          src={require("../media/peerskill512.png")}
+          style={{
+            width: "240px",
+            height: "240px"
+          }}
+          alt="app logo"
+        />
         <SignUpInputForm
           userSignUp={userSignUp}
           setUserSignUp={setUserSignUp}
@@ -87,8 +114,31 @@ function SignUpPage({ parentRouteTo }) {
           Sign Up
         </Button>
       </div>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title" style={{ color: "#1589FF" }}>
+          Sign Up account failed.
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-slide-description"
+            style={{ color: "black" }}
+          >
+            Please try again. Thank you.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} style={{ color: "#1589FF" }}>
+            CONTINUE
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
-
-export default observer(SignUpPage);

@@ -12,8 +12,10 @@ import { route, getApiRoute } from "../global";
 import useStores from "../hooks/useStores";
 import { observer } from "mobx-react";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+
 /* Import app components */
 import DialogPage from "../components/DialogPage";
+import LoadingNav from "../components/LoadingNav";
 
 function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
   const {
@@ -22,6 +24,7 @@ function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
   const routeTo = option => {
     if (option === route.close) {
       setDialogOpen(false);
@@ -29,38 +32,6 @@ function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
       setDialogOpen(true);
     }
     setRouteOption(option);
-  };
-
-  const handleCreate = () => {
-    const lesson = parentRouteArgs;
-    console.log("date: " + selectedDate);
-    axios
-      .post(
-        `${getApiRoute("events/create")}`,
-        {
-          lesson_id: lesson.id,
-          user_id: currentUser.id,
-          start_datetime: "2019-11-30 14:13:03.603560"
-        },
-        getToken()
-      )
-      .then(result => {
-        // console.log(result);
-        console.log("create event successfully");
-      })
-      .catch(error => {
-        console.log("ERROR: ", error);
-      });
-    parentRouteTo(route.close);
-  };
-
-  /* CSS Styles */
-  const ContainerStyles = {
-    display: "flex",
-    justifyContent: "center",
-    flexDirection: "column",
-    alignItems: "center",
-    width: "100%"
   };
 
   /* Date Picker */
@@ -73,6 +44,47 @@ function CreateEventPage({ parentRouteTo, parentRouteArgs }) {
       secondary: { main: "#1589FF" }
     }
   });
+
+  const handleCreate = () => {
+    const handleSubmit = parentRouteArgs.handleSubmit
+    const lesson = parentRouteArgs.lesson;
+    axios
+      .post(
+        `${getApiRoute("events/create")}`,
+        {
+          lesson_id: lesson.id,
+          user_id: currentUser.id,
+          start_datetime: selectedDate
+        },
+        getToken()
+      )
+      .then(result => {
+        handleSubmit()
+        console.log("create event successfully");
+      })
+      .catch(error => {
+        console.log("ERROR: ", error);
+      });
+      
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+         parentRouteTo(route.close);
+      }, 2000);
+  };
+
+  /* CSS Styles */
+  const ContainerStyles = {
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%"
+  };
+
+  if (isLoading) {
+    return <LoadingNav />;
+  }
   return (
     <>
       <MuiThemeProvider theme={theme}>

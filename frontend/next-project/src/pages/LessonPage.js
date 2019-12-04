@@ -7,6 +7,7 @@ import axios from "axios";
 /* Import app components */
 import DialogPage from "../components/DialogPage";
 import LessonInfoPage from "../pages/LessonInfoPage";
+import LoadingNav from "../components/LoadingNav";
 
 /* CSS Styles */
 const ContainerStyles = {
@@ -18,10 +19,12 @@ const ContainerStyles = {
 };
 
 export default function LessonPage({ parentRouteArgs }) {
-  const [bookmark, setBookmark] = useState(null);
+  const [bookmark, setBookmark] = useState(false);
+  const [event, setEvent] = useState(false);
   const [routeArgs, setRouteArgs] = useState([]);
   const [routeOption, setRouteOption] = useState(route.close);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const routeTo = option => {
     if (option === route.close) {
       setDialogOpen(false);
@@ -32,19 +35,41 @@ export default function LessonPage({ parentRouteArgs }) {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    };
     axios
-      .get(`${getApiRoute("bookmarks/")}${parentRouteArgs.lesson.id}`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("userToken")
+      .get(`${getApiRoute("bookmarks/")}${parentRouteArgs.lesson.id}`, config)
+      .then(result => {
+        setBookmark(result.data.data);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    axios
+      .get(`${getApiRoute("events/exists")}`, {
+        ...config,
+        params: {
+          lesson_id: parentRouteArgs.lesson.id
         }
       })
       .then(result => {
-        setBookmark(result.data.data);
+        setEvent(result.data);
+        setIsLoading(false);
       })
       .catch(error => {
         console.log(error);
       });
   }, []);
+
+  const handleSubmit = () => {
+    setEvent(true);
+  };
 
   const createBookmark = e => {
     e.preventDefault();
@@ -86,72 +111,106 @@ export default function LessonPage({ parentRouteArgs }) {
         },
         config
       )
-      .then(setBookmark(null))
+      .then(setBookmark(false))
       .catch(error => {
         console.log(error);
       });
   };
+
+  if (isLoading) {
+    return <LoadingNav />;
+  }
   function actionButton() {
     if (parentRouteArgs.showAction) {
       return (
         <>
-          {!bookmark ? (
-            <Button
-              style={{
-                backgroundColor: "#ffd100",
-                color: "#FFFFFF",
-                fontSize: "18px",
-                borderRadius: 16,
-                marginTop: "5px",
-                height: "45px",
-                width: 360,
-                fontWeight: "bold"
-              }}
-              onClick={e => {
-                createBookmark(e);
-              }}
-            >
-              Bookmark
-            </Button>
+          {!bookmark && !event ? (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#ffd100",
+                  color: "#FFFFFF",
+                  fontSize: "18px",
+                  borderRadius: 16,
+                  marginTop: "5px",
+                  height: "45px",
+                  width: 360,
+                  fontWeight: "bold"
+                }}
+                onClick={e => {
+                  createBookmark(e);
+                }}
+              >
+                Bookmark
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#1589FF",
+                  color: "#FFFFFF",
+                  fontSize: "18px",
+                  borderRadius: 16,
+                  marginTop: "5px",
+                  marginBottom: "20px",
+                  height: "45px",
+                  width: 360,
+                  fontWeight: "bold"
+                }}
+                onClick={() => {
+                  setRouteArgs({
+                    lesson: parentRouteArgs.lesson,
+                    handleSubmit: handleSubmit
+                  });
+                  routeTo(route.createEventPage);
+                }}
+              >
+                Request
+              </Button>
+            </>
+          ) : bookmark && !event ? (
+            <>
+              <Button
+                style={{
+                  backgroundColor: "#ff3333",
+                  color: "#FFFFFF",
+                  fontSize: "18px",
+                  borderRadius: 16,
+                  marginTop: "5px",
+                  height: "45px",
+                  width: 360,
+                  fontWeight: "bold"
+                }}
+                onClick={e => {
+                  deleteBookmark(e);
+                }}
+              >
+                Unbookmark
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: "#1589FF",
+                  color: "#FFFFFF",
+                  fontSize: "18px",
+                  borderRadius: 16,
+                  marginTop: "5px",
+                  marginBottom: "20px",
+                  height: "45px",
+                  width: 360,
+                  fontWeight: "bold"
+                }}
+                onClick={() => {
+                  setRouteArgs({
+                    lesson: parentRouteArgs.lesson,
+                    handleSubmit: handleSubmit
+                  });
+                  routeTo(route.createEventPage);
+                }}
+              >
+                Request
+              </Button>
+            </>
           ) : (
-            <Button
-              style={{
-                backgroundColor: "#ff3333",
-                color: "#FFFFFF",
-                fontSize: "18px",
-                borderRadius: 16,
-                marginTop: "5px",
-                height: "45px",
-                width: 360,
-                fontWeight: "bold"
-              }}
-              onClick={e => {
-                deleteBookmark(e);
-              }}
-            >
-              Unbookmark
-            </Button>
+            <></>
           )}
-
-          <Button
-            style={{
-              backgroundColor: "#1589FF",
-              color: "#FFFFFF",
-              fontSize: "18px",
-              borderRadius: 16,
-              marginTop: "5px",
-              marginBottom: "20px",
-              height: "45px",
-              width: 360,
-              fontWeight: "bold"
-            }}
-            onClick={() => {
-              setRouteArgs(parentRouteArgs.lesson);
-              routeTo(route.createEventPage);
-            }}
-          >
-            Request
-          </Button>
         </>
       );
     } else {
